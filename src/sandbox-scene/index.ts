@@ -1,4 +1,8 @@
 import * as THREE from '../../node_modules/three';
+import { JTrimino } from '../models/JTrimino';
+import { LTrimino } from '../models/LTrimino';
+import { OTrimino } from '../models/OTrimino';
+import * as constants from '../constants';
 
 function quickRand(): number {
   return (Math.random() - Math.random()) * 20;
@@ -27,17 +31,32 @@ export class SandboxScene {
     this.camera.position.z = 10;
 
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
 
     const geometry = new THREE.BoxGeometry(1, 4, 1);
     const material = new THREE.MeshStandardMaterial({ color: 0x8888ff });
     this.cube1 = new THREE.Mesh(geometry, material);
-    this.cube1.position.set(2, 0, 0);
+    this.cube1.position.set(2, 3, 0);
 
     var geometry2 = new THREE.BoxGeometry(1.5, 1.7, 1.5);
     var material2 = new THREE.MeshStandardMaterial({ color: 0xffff00 });
     this.cube2 = new THREE.Mesh(geometry2, material2);
-    this.cube2.position.set(-4, 0, 0);
+    this.cube2.position.set(-4, 3, 0);
+
+    var j = new JTrimino();
+    j.move(constants.Direction.Down, 3.0);
+    j.move(constants.Direction.Right, 2.0);
+    j.addToScene(this.scene);
+
+    var l = new LTrimino();
+    l.move(constants.Direction.Down, 3.0);
+    l.move(constants.Direction.Left, 2.0);
+    l.addToScene(this.scene);
+
+    var o = new OTrimino();
+    o.move(constants.Direction.Down, 3.0);
+    o.move(constants.Direction.Left, 5.0);
+    o.addToScene(this.scene);
 
     document.body.appendChild(this.renderer.domElement);
   }
@@ -93,9 +112,11 @@ export class SandboxScene {
   }
 
 
-  animate() {
+  Animate = () => {
     console.log('SandboxScene.animate');
     if (!this.stop) {
+
+      requestAnimationFrame(this.Animate);
 
       this.cube1.rotation.x += 0.01;
       this.cube1.rotation.y += 0.01;
@@ -116,7 +137,7 @@ export class SandboxScene {
         }
         this.bgCubeFrameTimer = this.bgCubeWaitFrames;
       }
-      
+
       this.bgCubeFrameTimer --;
       this.renderer.render(this.scene, this.camera);
     }
