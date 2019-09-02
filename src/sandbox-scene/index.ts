@@ -2,6 +2,10 @@ import * as THREE from '../../node_modules/three';
 import { JTrimino } from '../models/JTrimino';
 import { LTrimino } from '../models/LTrimino';
 import { OTrimino } from '../models/OTrimino';
+import { STrimino } from '../models/STrimino';
+import { ZTrimino } from '../models/ZTrimino';
+import { ITrimino } from '../models/ITrimino';
+import { TTrimino } from '../models/TTrimino';
 import * as constants from '../constants';
 
 function quickRand(): number {
@@ -16,6 +20,21 @@ export class SandboxScene {
   bgCubes: THREE.Mesh[];
   bgCubeFrameTimer: number = 10;
   bgCubeWaitFrames: number = 10;
+  j: JTrimino;
+  l: LTrimino;
+  t: TTrimino;
+  i: ITrimino;
+  s: STrimino;
+  z: ZTrimino;
+  o: OTrimino;
+
+  jSpin: number = Math.random();
+  lSpin: number = Math.random();
+  tSpin: number = Math.random();
+  iSpin: number = Math.random();
+  sSpin: number = Math.random();
+  zSpin: number = Math.random();
+  oSpin: number = Math.random();
 
   cube1: THREE.Mesh;
   cube2: THREE.Mesh;
@@ -43,20 +62,13 @@ export class SandboxScene {
     this.cube2 = new THREE.Mesh(geometry2, material2);
     this.cube2.position.set(-4, 3, 0);
 
-    var j = new JTrimino();
-    j.move(constants.Direction.Down, 3.0);
-    j.move(constants.Direction.Right, 2.0);
-    j.addToScene(this.scene);
-
-    var l = new LTrimino();
-    l.move(constants.Direction.Down, 3.0);
-    l.move(constants.Direction.Left, 2.0);
-    l.addToScene(this.scene);
-
-    var o = new OTrimino();
-    o.move(constants.Direction.Down, 3.0);
-    o.move(constants.Direction.Left, 5.0);
-    o.addToScene(this.scene);
+    this.j = new JTrimino();
+    this.l = new LTrimino();
+    this.i = new ITrimino();
+    this.s = new STrimino();
+    this.z = new ZTrimino();
+    this.t = new TTrimino();
+    this.o = new OTrimino();
 
     document.body.appendChild(this.renderer.domElement);
   }
@@ -65,8 +77,36 @@ export class SandboxScene {
     console.log('SandboxScene.init');
     this.initBgCubes(260);
     this.lights();
-    this.scene.add(this.cube1);
-    this.scene.add(this.cube2);
+    this.addTriminos();
+    // this.scene.add(this.cube1);
+    // this.scene.add(this.cube2);
+  }
+
+  addTriminos() {
+
+    this.j.move(constants.Direction.Down, 3.0);
+    this.j.move(constants.Direction.Right, 2.0);
+    this.j.addToScene(this.scene);
+
+    this.l.move(constants.Direction.Down, 3.0);
+    this.l.move(constants.Direction.Left, 2.0);
+    this.l.addToScene(this.scene);
+
+    this.o.move(constants.Direction.Down, 3.0);
+    this.o.move(constants.Direction.Left, 5.0);
+    this.o.addToScene(this.scene);
+
+    this.z.move(constants.Direction.Down, 3.0);
+    this.z.move(constants.Direction.Right, 5.0);
+    this.z.addToScene(this.scene);
+
+    this.s.move(constants.Direction.Left, 8.0);
+    this.s.addToScene(this.scene);
+
+    this.i.move(constants.Direction.Right, 8.0);
+    this.i.addToScene(this.scene);
+
+    this.t.addToScene(this.scene);
   }
 
   initBgCubes(count: number) {
@@ -94,11 +134,11 @@ export class SandboxScene {
 
   lights() {
     console.log('SandboxScene.lights');
-    var light = new THREE.PointLight(0x00ffff, 1, 100);
+    var light = new THREE.PointLight(0x88ffff, 1, 100);
     light.position.set(5, 5, 5);
     this.scene.add(light);
 
-    var light2 = new THREE.PointLight(0xff0000, 1, 50);
+    var light2 = new THREE.PointLight(0xff8888, 1, 50);
     light2.position.set(-5, -5, 5);
     this.scene.add(light2);
 
@@ -126,6 +166,38 @@ export class SandboxScene {
       this.cube2.rotation.y += 0.01;
       this.cube2.rotation.z += 0.02;
 
+      this.j.move(constants.Direction.Left, Math.random() *0.05);
+      this.l.move(constants.Direction.Left, Math.random() *0.05);
+      this.i.move(constants.Direction.Left, Math.random() *0.05);
+      this.s.move(constants.Direction.Left, Math.random() *0.05);
+      this.z.move(constants.Direction.Left, Math.random() *0.05);
+      this.t.move(constants.Direction.Left, Math.random() *0.05);
+      this.o.move(constants.Direction.Left, Math.random() *0.05);
+
+      this.j.move(constants.Direction.Right, Math.random() *0.05);
+      this.l.move(constants.Direction.Right, Math.random() *0.05);
+      this.i.move(constants.Direction.Right, Math.random() *0.05);
+      this.s.move(constants.Direction.Right, Math.random() *0.05);
+      this.z.move(constants.Direction.Right, Math.random() *0.05);
+      this.t.move(constants.Direction.Right, Math.random() *0.05);
+      this.o.move(constants.Direction.Right, Math.random() *0.05);
+
+      this.j.move(constants.Direction.Up, Math.random() *0.05);
+      this.l.move(constants.Direction.Up, Math.random() *0.05);
+      this.i.move(constants.Direction.Up, Math.random() *0.05);
+      this.s.move(constants.Direction.Up, Math.random() *0.05);
+      this.z.move(constants.Direction.Up, Math.random() *0.05);
+      this.t.move(constants.Direction.Up, Math.random() *0.05);
+      this.o.move(constants.Direction.Up, Math.random() *0.05);
+
+      this.j.move(constants.Direction.Down, Math.random() *0.05);
+      this.l.move(constants.Direction.Down, Math.random() *0.05);
+      this.i.move(constants.Direction.Down, Math.random() *0.05);
+      this.s.move(constants.Direction.Down, Math.random() *0.05);
+      this.z.move(constants.Direction.Down, Math.random() *0.05);
+      this.t.move(constants.Direction.Down, Math.random() *0.05);
+      this.o.move(constants.Direction.Down, Math.random() *0.05);
+
       if (this.bgCubeFrameTimer === 0) {
         var ind = Math.floor(Math.random() * this.bgCubes.length);
         if (this.scene.getObjectByName(this.bgCubes[ind].name)) {
@@ -138,7 +210,7 @@ export class SandboxScene {
         this.bgCubeFrameTimer = this.bgCubeWaitFrames;
       }
 
-      this.bgCubeFrameTimer --;
+      this.bgCubeFrameTimer--;
       this.renderer.render(this.scene, this.camera);
     }
   }
