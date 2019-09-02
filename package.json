@@ -4,15 +4,17 @@
   "description": "3js implementation of tetris",
   "main": "index.js",
   "dependencies": {
+    "@types/uuid": "^3.4.5",
+    "three": "^0.108.0",
     "typescript": "^3.6.2",
-    "three": "^0.108.0"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^12.7.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist && mkdir dist && cp ./src/* ./dist && tsc && browserify ./src/index.js -o ./dist/bundle.js",
+    "build": "./build.sh",
     "start": "open ./dist/index.html"
   },
   "repository": {
