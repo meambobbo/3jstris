@@ -6,6 +6,7 @@ import { STrimino } from '../models/STrimino';
 import { ZTrimino } from '../models/ZTrimino';
 import { ITrimino } from '../models/ITrimino';
 import { TTrimino } from '../models/TTrimino';
+import { JTrimino2 } from '../models/JTrimino2';
 import * as c from '../constants';
 
 function quickRand(): number {
@@ -16,7 +17,7 @@ export class SandboxScene {
   stop: boolean;
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
-  camera: THREE.Camera;
+  camera: THREE.PerspectiveCamera;
   bgCubes: THREE.Mesh[];
   bgCubeFrameTimer: number = 10;
   bgCubeWaitFrames: number = 10;
@@ -27,6 +28,7 @@ export class SandboxScene {
   s: STrimino;
   z: ZTrimino;
   o: OTrimino;
+  j2: JTrimino2;
 
   jSpin: number = Math.random();
   lSpin: number = Math.random();
@@ -42,28 +44,28 @@ export class SandboxScene {
   moveCounter: number = 0;
   moveDirection: c.Direction = c.Direction.Up;
 
+  cameraMovementSpeed: number = -0.1;
+  cameraMovementDirection: c.Direction = c.Direction.Left;
+
   constructor() {
     console.log('new SandboxScene');
     this.stop = false;
     this.bgCubes = [];
 
     this.scene = new THREE.Scene();
-
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 20;
-
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
+    this.camera = this.createCamera();
+    this.renderer = this.createRenderer();
+    window.addEventListener('resize', this.OnWindowResize, false);
 
     const geometry = new THREE.BoxGeometry(1, 4, 1);
     const material = new THREE.MeshStandardMaterial({ color: 0x8888ff });
     this.cube1 = new THREE.Mesh(geometry, material);
-    this.cube1.position.set(2, 3, 0);
+    this.cube1.position.set(2, 3, 5);
 
     var geometry2 = new THREE.BoxGeometry(1.5, 1.7, 1.5);
     var material2 = new THREE.MeshStandardMaterial({ color: 0xffff00 });
     this.cube2 = new THREE.Mesh(geometry2, material2);
-    this.cube2.position.set(-4, 3, 0);
+    this.cube2.position.set(-4, 3, 3);
 
     this.j = new JTrimino();
     this.l = new LTrimino();
@@ -72,20 +74,20 @@ export class SandboxScene {
     this.z = new ZTrimino();
     this.t = new TTrimino();
     this.o = new OTrimino();
-
-    document.body.appendChild(this.renderer.domElement);
+    this.j2 = new JTrimino2();
   }
 
   init(): void {
     // console.log('SandboxScene.init');
-    this.initBgCubes(260);
+    this.initBgCubes(20);
     this.lights();
     this.addTriminos();
-    // this.scene.add(this.cube1);
-    // this.scene.add(this.cube2);
+    this.scene.add(this.cube1);
+    this.scene.add(this.cube2);
+    document.body.append(this.renderer.domElement);
   }
 
-  addTriminos() {
+  addTriminos(): void {
     this.j.move(c.Direction.Down, 3.0);
     this.j.move(c.Direction.Right, 2.0);
     this.j.addToScene(this.scene);
@@ -108,17 +110,21 @@ export class SandboxScene {
     this.i.move(c.Direction.Right, 8.0);
     this.i.addToScene(this.scene);
 
+    this.t.move(c.Direction.Up, 8.0);
     this.t.addToScene(this.scene);
+
+    // this.j2.moveBone(c.Direction.Up, 5.0);
+    // this.j2.addToScene(this.scene);
   }
 
-  initBgCubes(count: number) {
+  initBgCubes(count: number): void {
     // console.log('SandboxScene.initBgCubes');
     for (var i = 0; i < count; i++) {
       this.addNewRandomCube();
     }
   }
 
-  addNewRandomCube() {
+  addNewRandomCube(): void {
     // console.log('SandboxScene.addNewRandomCube');
     var geometryTemp = new THREE.BoxGeometry(1, 1, 1);
     var materialTemp = new THREE.MeshStandardMaterial({ color: 0x8888ff });
@@ -134,22 +140,26 @@ export class SandboxScene {
     this.bgCubes.push(cubeTemp);
   }
 
-  lights() {
+  lights(): void {
     // console.log('SandboxScene.lights');
-    var light = new THREE.PointLight(0x88ffff, 1, 100);
-    light.position.set(5, 5, 5);
-    this.scene.add(light);
+    // var light = new THREE.PointLight(0xddffff, 1, 100);
+    // light.position.set(0, 0, 8);
+    // this.scene.add(light);
 
-    var light2 = new THREE.PointLight(0xff8888, 1, 50);
-    light2.position.set(-5, -5, 5);
-    this.scene.add(light2);
+    // var light2 = new THREE.PointLight(0xffffdd, 1, 50);
+    // light2.position.set(15, 10, 10);
+    // this.scene.add(light2);
 
-    var light3 = new THREE.PointLight(0xffffff, 1, 100);
-    light3.position.set(20, 5, 8);
+    var ambLight = new THREE.AmbientLight(0xaa8888);
+    // var ambLight = new THREE.AmbientLight(0x404040);
+    this.scene.add(ambLight);
+
+    var light3 = new THREE.PointLight(0xffffff, 0.50, 0);
+    light3.position.set(4, 3, 8);
     this.scene.add(light3);
 
-    var light4 = new THREE.PointLight(0xffffff, 1, 100);
-    light4.position.set(-20, 5, 5);
+    var light4 = new THREE.PointLight(0xffffff, 0.50, 0);
+    light4.position.set(-4, 3, 8);
     this.scene.add(light4);
   }
 
@@ -166,8 +176,8 @@ export class SandboxScene {
       this.cube2.rotation.z += 0.02;
 
       this.animateTriminos();
-
       this.animateBgCubes();
+      this.animateCamera();
 
       this.renderer.render(this.scene, this.camera);
       requestAnimationFrame(this.Animate);
@@ -180,9 +190,10 @@ export class SandboxScene {
       if (this.scene.getObjectByName(this.bgCubes[ind].name)) {
         var obj: THREE.Object3D = this.scene.getObjectByName(
           this.bgCubes[ind].name) as THREE.Object3D;
-        this.scene.remove(obj as THREE.Object3D);
-        this.bgCubes.splice(ind, 1);
-        this.addNewRandomCube();
+        obj.position.set(
+          quickRand() * (window.innerWidth / window.innerHeight) * 1.5,
+          quickRand() * 1.5, 
+          Math.random() * .8 - 10);
       }
       this.bgCubeFrameTimer = this.bgCubeWaitFrames;
     }
@@ -191,37 +202,7 @@ export class SandboxScene {
   }
 
   animateTriminos(): void {
-    // this.j.move(constants.Direction.Left, Math.random() *0.05);
-    // this.l.move(constants.Direction.Left, Math.random() *0.05);
-    // this.i.move(constants.Direction.Left, Math.random() *0.05);
-    // this.s.move(constants.Direction.Left, Math.random() *0.05);
-    // this.z.move(constants.Direction.Left, Math.random() *0.05);
-    // this.t.move(constants.Direction.Left, Math.random() *0.05);
-    // this.o.move(constants.Direction.Left, Math.random() *0.05);
 
-    // this.j.move(constants.Direction.Right, Math.random() *0.05);
-    // this.l.move(constants.Direction.Right, Math.random() *0.05);
-    // this.i.move(constants.Direction.Right, Math.random() *0.05);
-    // this.s.move(constants.Direction.Right, Math.random() *0.05);
-    // this.z.move(constants.Direction.Right, Math.random() *0.05);
-    // this.t.move(constants.Direction.Right, Math.random() *0.05);
-    // this.o.move(constants.Direction.Right, Math.random() *0.05);
-
-    // this.j.move(constants.Direction.Up, Math.random() *0.05);
-    // this.l.move(constants.Direction.Up, Math.random() *0.05);
-    // this.i.move(constants.Direction.Up, Math.random() *0.05);
-    // this.s.move(constants.Direction.Up, Math.random() *0.05);
-    // this.z.move(constants.Direction.Up, Math.random() *0.05);
-    // this.t.move(constants.Direction.Up, Math.random() *0.05);
-    // this.o.move(constants.Direction.Up, Math.random() *0.05);
-
-    // this.j.move(constants.Direction.Down, Math.random() *0.05);
-    // this.l.move(constants.Direction.Down, Math.random() *0.05);
-    // this.i.move(constants.Direction.Down, Math.random() *0.05);
-    // this.s.move(constants.Direction.Down, Math.random() *0.05);
-    // this.z.move(constants.Direction.Down, Math.random() *0.05);
-    // this.t.move(constants.Direction.Down, Math.random() *0.05);
-    // this.o.move(constants.Direction.Down, Math.random() *0.05);
     if (this.moveCounter < 30) {
       this.moveCounter++;
     } else {
@@ -252,6 +233,46 @@ export class SandboxScene {
           break;
       }
     }
+  }
 
+  createCamera(): THREE.PerspectiveCamera {
+    var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 30;
+    return camera;
+  }
+
+  createRenderer(): THREE.WebGLRenderer {
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
+    return renderer;
+  }
+
+  OnWindowResize = () => {
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  animateCamera(): void {
+    if (this.camera.position.x >= 4.0 && this.cameraMovementDirection !== c.Direction.Left) {
+      this.cameraMovementDirection = c.Direction.Left;
+      this.cameraMovementSpeed *= -1.0;
+    } else if (this.camera.position.x <= -4.0 && this.cameraMovementDirection !== c.Direction.Right) {
+      this.cameraMovementDirection = c.Direction.Right;
+      this.cameraMovementSpeed *= -1.0;
+    }
+
+    if (this.cameraMovementSpeed <= 0.1) {
+      this.cameraMovementSpeed += 0.001;
+    }
+
+    if (this.cameraMovementDirection == c.Direction.Left) {
+      this.camera.position.x += this.cameraMovementSpeed * -1.0;
+    } else {
+      this.camera.position.x += this.cameraMovementSpeed;
+    }
+
+    this.camera.lookAt(this.scene.position);
+    this.camera.updateProjectionMatrix();
   }
 }
