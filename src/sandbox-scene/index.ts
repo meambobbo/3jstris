@@ -206,13 +206,13 @@ export class SandboxScene {
     if (this.moveCounter < 30) {
       this.moveCounter++;
     } else {
-      this.j.move(this.moveDirection, 1);
+      // this.j.move(this.moveDirection, 1);
       this.l.move(this.moveDirection, 1);
-      this.i.move(this.moveDirection, 1);
+      // this.i.move(this.moveDirection, 1);
       this.s.move(this.moveDirection, 1);
       this.z.move(this.moveDirection, 1);
-      this.t.move(this.moveDirection, 1);
-      this.o.move(this.moveDirection, 1);
+      // this.t.move(this.moveDirection, 1);
+      // this.o.move(this.moveDirection, 1);
 
       this.moveCounter = 0;
       switch (this.moveDirection) {
