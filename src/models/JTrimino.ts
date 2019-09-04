@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 export class JTrimino extends SomeTrimino {
 	uuid: String = uuid();
 	meshes: THREE.Mesh[] = [];
-	color: number = 0x0000ff;
+	color: number = 0xff00dd;
 
 	constructor() {
 		super();
