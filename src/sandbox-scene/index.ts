@@ -46,6 +46,7 @@ export class SandboxScene {
 
   cameraMovementSpeed: number = -0.1;
   cameraMovementDirection: c.Direction = c.Direction.Left;
+  circleCameraFrameCount: number = 0;
 
   constructor() {
     console.log('new SandboxScene');
@@ -79,7 +80,7 @@ export class SandboxScene {
 
   init(): void {
     // console.log('SandboxScene.init');
-    this.initBgCubes(20);
+    this.initBgCubes(40);
     this.lights();
     this.addTriminos();
     this.scene.add(this.cube1);
@@ -177,7 +178,8 @@ export class SandboxScene {
 
       this.animateTriminos();
       this.animateBgCubes();
-      this.animateCamera();
+      // this.animateCamera();
+      this.animateCameraCircle();
 
       this.renderer.render(this.scene, this.camera);
       requestAnimationFrame(this.Animate);
@@ -192,7 +194,7 @@ export class SandboxScene {
           this.bgCubes[ind].name) as THREE.Object3D;
         obj.position.set(
           quickRand() * (window.innerWidth / window.innerHeight) * 1.5,
-          quickRand() * 1.5, 
+          quickRand() * 1.5,
           Math.random() * .8 - 10);
       }
       this.bgCubeFrameTimer = this.bgCubeWaitFrames;
@@ -272,6 +274,20 @@ export class SandboxScene {
       this.camera.position.x += this.cameraMovementSpeed;
     }
 
+    this.camera.lookAt(this.scene.position);
+    this.camera.updateProjectionMatrix();
+  }
+
+  animateCameraCircle(): void {
+    // map a framecount to radians to make a full circle
+    // r^2 = x^2 + y^2
+
+    this.camera.position.x = (Math.cos(this.circleCameraFrameCount / 150.0 * Math.PI)) * 5;
+    this.camera.position.y = (Math.sin(this.circleCameraFrameCount / 150.0 * Math.PI)) * 5;
+    if (this.circleCameraFrameCount >= 300) {
+      this.circleCameraFrameCount = -1;
+    }
+    this.circleCameraFrameCount++;
     this.camera.lookAt(this.scene.position);
     this.camera.updateProjectionMatrix();
   }
