@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three';
+import * as THREE from 'three';
 import * as c from '../constants';
 import * as lib from './lib';
 import { SomeTrimino } from './SomeTrimino';

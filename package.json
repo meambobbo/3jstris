@@ -7,15 +7,35 @@
     "@types/uuid": "^3.4.5",
     "three": "^0.108.0",
     "typescript": "^3.6.2",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "browserify": "^16.5.0",
+    "three-gltf-loader": "1.108.0"
   },
   "devDependencies": {
     "@types/node": "^12.7.3"
   },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": "mdcs",
+    "plugins": [
+      "html",
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/indent": [
+        "error",
+        "tab",
+        {
+          "SwitchCase": 1
+        }
+      ]
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./build.sh",
-    "start": "open ./dist/index.html"
+    "start": "http-server ./dist"
   },
   "repository": {
     "type": "git",

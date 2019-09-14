@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three';
+import * as THREE from 'three';
 import * as c from '../constants';
 import * as lib from './lib';
 import { SomeTrimino } from './SomeTrimino';
@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 export class ITrimino extends SomeTrimino {
 	uuid: String = uuid();
 	meshes: THREE.Mesh[] = [];
-	color: number = 0x0044ff;
+	color: number = 0x0088ff;
 
 	constructor() {
 		super();

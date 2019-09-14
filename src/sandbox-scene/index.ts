@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three';
+import * as THREE from 'three';
 import { JTrimino } from '../models/JTrimino';
 import { LTrimino } from '../models/LTrimino';
 import { OTrimino } from '../models/OTrimino';
@@ -7,6 +7,7 @@ import { ZTrimino } from '../models/ZTrimino';
 import { ITrimino } from '../models/ITrimino';
 import { TTrimino } from '../models/TTrimino';
 import { JTrimino2 } from '../models/JTrimino2';
+import { LTrimino2 } from '../models/LTrimino2';
 import * as c from '../constants';
 
 function quickRand(): number {
@@ -29,6 +30,7 @@ export class SandboxScene {
   z: ZTrimino;
   o: OTrimino;
   j2: JTrimino2;
+  l2: LTrimino2;
 
   jSpin: number = Math.random();
   lSpin: number = Math.random();
@@ -76,15 +78,17 @@ export class SandboxScene {
     this.t = new TTrimino();
     this.o = new OTrimino();
     this.j2 = new JTrimino2();
+    this.l2 = new LTrimino2();
   }
 
   init(): void {
     // console.log('SandboxScene.init');
     this.initBgCubes(40);
     this.lights();
-    this.addTriminos();
-    this.scene.add(this.cube1);
-    this.scene.add(this.cube2);
+    // this.addTriminos();
+    this.addSkinnedTriminos();
+    // this.scene.add(this.cube1);
+    // this.scene.add(this.cube2);
     document.body.append(this.renderer.domElement);
   }
 
@@ -116,6 +120,10 @@ export class SandboxScene {
 
     // this.j2.moveBone(c.Direction.Up, 5.0);
     // this.j2.addToScene(this.scene);
+  }
+
+  addSkinnedTriminos(): void {
+    this.l2.addToScene(this.scene);
   }
 
   initBgCubes(count: number): void {
