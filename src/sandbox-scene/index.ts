@@ -32,6 +32,10 @@ export class SandboxScene {
   j2: JTrimino2;
   l2: LTrimino2;
 
+  l2x: LTrimino2;
+  l2y: LTrimino2;
+  l2z: LTrimino2;
+
   jSpin: number = Math.random();
   lSpin: number = Math.random();
   tSpin: number = Math.random();
@@ -50,6 +54,12 @@ export class SandboxScene {
   cameraMovementDirection: c.Direction = c.Direction.Left;
   circleCameraFrameCount: number = 0;
 
+  frameCounter: number = 0;
+
+  rotationAxis: string = 'x';
+  testSkinBox: THREE.SkinnedMesh;
+  testSkinBoxBone: THREE.Bone;
+
   constructor() {
     console.log('new SandboxScene');
     this.stop = false;
@@ -58,6 +68,8 @@ export class SandboxScene {
     this.scene = new THREE.Scene();
     this.camera = this.createCamera();
     this.renderer = this.createRenderer();
+    this.testSkinBox = new THREE.SkinnedMesh();
+    this.testSkinBoxBone = new THREE.Bone();
     window.addEventListener('resize', this.OnWindowResize, false);
 
     const geometry = new THREE.BoxGeometry(1, 4, 1);
@@ -79,6 +91,10 @@ export class SandboxScene {
     this.o = new OTrimino();
     this.j2 = new JTrimino2();
     this.l2 = new LTrimino2();
+
+    this.l2x = new LTrimino2();
+    this.l2y = new LTrimino2();
+    this.l2z = new LTrimino2();
   }
 
   init(): void {
@@ -89,7 +105,35 @@ export class SandboxScene {
     this.addSkinnedTriminos();
     // this.scene.add(this.cube1);
     // this.scene.add(this.cube2);
+    // this.addSkinnedBox();
     document.body.append(this.renderer.domElement);
+  }
+
+  addSkinnedBox() {
+    var simpleGeom: THREE.Geometry = new THREE.BoxGeometry();
+    var bufferGeom: THREE.BufferGeometry = new THREE.BufferGeometry().fromGeometry(simpleGeom);
+    var position = bufferGeom.getAttribute('position');
+    var skinInds = [];
+    var skinWeights = [];
+    for (let i = 0; i < position.count; i++) {
+      skinInds.push(0, 0, 0, 0);
+      skinWeights.push(1, 0, 0, 0);
+    }
+    bufferGeom.removeAttribute('skinIndex');
+    bufferGeom.removeAttribute('skinWeight');
+
+    bufferGeom.addAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinInds, 4));
+    bufferGeom.addAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+    var mesh: THREE.SkinnedMesh = new THREE.SkinnedMesh(bufferGeom, new THREE.MeshStandardMaterial());
+    mesh.scale.x = 6;
+    mesh.scale.y = 4;
+
+    var bone: THREE.Bone = new THREE.Bone();
+    mesh.add(bone);
+    mesh.bind(new THREE.Skeleton([bone]));
+    this.scene.add(mesh);
+    this.testSkinBox = mesh;
+    this.testSkinBoxBone = mesh.skeleton.bones[0];
   }
 
   addTriminos(): void {
@@ -117,13 +161,18 @@ export class SandboxScene {
 
     this.t.move(c.Direction.Up, 8.0);
     this.t.addToScene(this.scene);
-
-    // this.j2.moveBone(c.Direction.Up, 5.0);
-    // this.j2.addToScene(this.scene);
   }
 
   addSkinnedTriminos(): void {
-    this.l2.addToScene(this.scene);
+    // this.l2.loadInto(this.scene);
+    // this.l2.addToScene(this.scene);
+
+    this.l2x.loadInto(this.scene);
+    this.l2y.loadInto(this.scene);
+    this.l2z.loadInto(this.scene);
+
+    this.j2.addToScene(this.scene);
+    this.j2.bone!.position.y = 8;
   }
 
   initBgCubes(count: number): void {
@@ -150,14 +199,6 @@ export class SandboxScene {
   }
 
   lights(): void {
-    // console.log('SandboxScene.lights');
-    // var light = new THREE.PointLight(0xddffff, 1, 100);
-    // light.position.set(0, 0, 8);
-    // this.scene.add(light);
-
-    // var light2 = new THREE.PointLight(0xffffdd, 1, 50);
-    // light2.position.set(15, 10, 10);
-    // this.scene.add(light2);
 
     var ambLight = new THREE.AmbientLight(0xaa8888);
     // var ambLight = new THREE.AmbientLight(0x404040);
@@ -175,16 +216,21 @@ export class SandboxScene {
 
   Animate = () => {
     // console.log('SandboxScene.animate');
+    this.frameCounter++;
     if (!this.stop) {
-      this.cube1.rotation.x += 0.01;
-      this.cube1.rotation.y += 0.01;
-      this.cube1.rotation.z += 0.04;
 
-      this.cube2.rotation.x += 0.06;
-      this.cube2.rotation.y += 0.01;
-      this.cube2.rotation.z += 0.02;
+      if (this.frameCounter % (60) == 0) {
+        this.l2x.bone.position.x = -10;
+        this.l2z.bone.position.x = 10;
 
-      this.animateTriminos();
+        this.l2x.rotateBone(c.Spin.CW, Math.PI / 2);
+        this.l2y.rotateBone(c.Spin.CCW, Math.PI / 2);
+        this.l2z.rotateBone(c.Spin.CW, Math.PI / 2);
+
+        this.j2.rotateBone(c.Spin.CCW, Math.PI /8);
+      }
+
+      // this.animateTriminos();
       this.animateBgCubes();
       // this.animateCamera();
       this.animateCameraCircle();
@@ -247,7 +293,8 @@ export class SandboxScene {
 
   createCamera(): THREE.PerspectiveCamera {
     var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 30;
+    camera.position.set(0, 0, 40);
+    camera.lookAt(0, 0, 0);
     return camera;
   }
 
@@ -282,7 +329,7 @@ export class SandboxScene {
       this.camera.position.x += this.cameraMovementSpeed;
     }
 
-    this.camera.lookAt(this.scene.position);
+    this.camera.lookAt(0, 0, 0);
     this.camera.updateProjectionMatrix();
   }
 
@@ -290,8 +337,10 @@ export class SandboxScene {
     // map a framecount to radians to make a full circle
     // r^2 = x^2 + y^2
 
-    this.camera.position.x = (Math.cos(this.circleCameraFrameCount / 150.0 * Math.PI)) * 5;
-    this.camera.position.y = (Math.sin(this.circleCameraFrameCount / 150.0 * Math.PI)) * 5;
+    this.camera.position.x = (Math.cos(this.circleCameraFrameCount / 150.0 * Math.PI)) * 10;
+    this.camera.position.y = (Math.sin(this.circleCameraFrameCount / 150.0 * Math.PI)) * 10;
+    // this.camera.position.x += (Math.cos(this.circleCameraFrameCount / 150.0 * Math.PI)) * 0.55;
+    // this.camera.position.y += (Math.sin(this.circleCameraFrameCount / 150.0 * Math.PI)) * 0.55;
     if (this.circleCameraFrameCount >= 300) {
       this.circleCameraFrameCount = -1;
     }

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from '../../node_modules/three';
 import * as c from '../constants';
 
 export function quickCube(materialColor: number): THREE.Mesh {
@@ -11,19 +11,25 @@ export function quickCube(materialColor: number): THREE.Mesh {
 }
 
 export function quickSkinnedCube(materialColor: number): THREE.SkinnedMesh {
-	var geometry: THREE.BufferGeometry = new THREE.BufferGeometry();
-
-	var vertices = new Float32Array( [
-	-1.0, -1.0,  1.0,
-	 1.0, -1.0,  1.0,
-	 1.0,  1.0,  1.0,
-
-	 1.0,  1.0,  1.0,
-	-1.0,  1.0,  1.0,
-	-1.0, -1.0,  1.0] );
-
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-
+	var geometry: THREE.BufferGeometry = new THREE.BufferGeometry().fromGeometry(new THREE.BoxGeometry(1,1,1));
+	skinIndicesAndWeights(geometry);
 	var material = new THREE.MeshStandardMaterial({ color: materialColor });
 	return new THREE.SkinnedMesh(geometry, material);
+}
+
+export function skinIndicesAndWeights(geometry: THREE.BufferGeometry) {
+	var position: THREE.BufferAttribute = geometry.attributes.position as THREE.BufferAttribute;
+	var vertex = new THREE.Vector3();
+	var skinIndices = [];
+	var skinWeights = [];
+
+	for (var i = 0; i < position.count; i++) {
+		vertex.fromBufferAttribute(position, i);
+		skinIndices.push(0, 0, 0, 0);
+		skinWeights.push(1, 0, 0, 0);
+	}
+	geometry.removeAttribute('skinIndex');
+	geometry.removeAttribute('skinWeight');
+	geometry.addAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+	geometry.addAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
 }

@@ -6,54 +6,48 @@ import { v4 as uuid } from 'uuid';
 
 export class JTrimino2 extends SomeTrimino2 {
 	uuid: String = uuid();
-	meshes: THREE.SkinnedMesh[] = [];
 	color: number = 0xff00dd;
-	skeleton: THREE.Skeleton;
 
 	constructor() {
 		super();
 
-		var cube1 = lib.quickSkinnedCube(this.color);
-		var cube2 = lib.quickSkinnedCube(this.color);
-		var cube3 = lib.quickSkinnedCube(this.color);
-		var cube4 = lib.quickSkinnedCube(this.color);
+		var cube1: THREE.SkinnedMesh = lib.quickSkinnedCube(this.color);
+		var cube2: THREE.SkinnedMesh = lib.quickSkinnedCube(this.color);
+		var cube3: THREE.SkinnedMesh = lib.quickSkinnedCube(this.color);
+		var cube4: THREE.SkinnedMesh = lib.quickSkinnedCube(this.color);
+		this.bone = new THREE.Bone();
+		var bone2 = new THREE.Bone();
+		var bone3 = new THREE.Bone();
+		var bone4 = new THREE.Bone();
+		this.bone.add(bone2);
+		this.bone.add(bone3);
+		this.bone.add(bone4);
 
-		var rootBone: THREE.Bone = new THREE.Bone();
-		var cube1Bone: THREE.Bone = new THREE.Bone();
-		var cube2Bone: THREE.Bone = new THREE.Bone();
-		var cube3Bone: THREE.Bone = new THREE.Bone();
-		var cube4Bone: THREE.Bone = new THREE.Bone();
-		rootBone.add(cube1Bone);
-		rootBone.add(cube2Bone);
-		rootBone.add(cube3Bone);
-		rootBone.add(cube4Bone);
+		this.bone.position.set(0, -1, 0);
+		let skeleton: THREE.Skeleton = new THREE.Skeleton([this.bone, bone2, bone3, bone4]);
 
-		// bone.position.set(-1,-1, 0);
-		var bones: THREE.Bone[] = [rootBone, cube1Bone, cube2Bone, cube3Bone, cube4Bone];
-		this.skeleton = new THREE.Skeleton(bones);
+		cube1.add(this.bone);
+		cube2.add(bone2);
+		cube3.add(bone3);
+		cube4.add(bone4);
+		cube1.bind(skeleton);
+		cube2.bind(skeleton);
+		cube3.bind(skeleton);
+		cube4.bind(skeleton);
 
-		cube1.add(cube1Bone);
-		cube2.add(cube2Bone);
-		cube3.add(cube3Bone);
-		cube4.add(cube4Bone);
-		cube1.bind(this.skeleton);
-		cube2.bind(this.skeleton);
-		cube3.bind(this.skeleton);
-		cube4.bind(this.skeleton);
-
-		cube1Bone.position.set(0, constants.GRID_SIZE, 0);
-		cube2Bone.position.set(0, 0, 0);
-		cube3Bone.position.set(0, constants.GRID_SIZE * -1, 0);
-		cube4Bone.position.set(constants.GRID_SIZE * -1, constants.GRID_SIZE * -1, 0);
+		cube1.position.set(0, 1, 0);
+		cube2.position.set(0, 0, 0);
+		cube3.position.set(0, -1, 0);
+		cube4.position.set(-1, -1, 0);
+		
+		this.meshes.push(cube1, cube2, cube3, cube4);
 
 		cube1.name = 'J1-' + this.uuid;
 		cube2.name = 'J2-' + this.uuid;
 		cube3.name = 'J3-' + this.uuid;
 		cube4.name = 'J4-' + this.uuid;
 
-		this.meshes.push(cube1);
-		this.meshes.push(cube2);
-		this.meshes.push(cube3);
-		this.meshes.push(cube4);
+		console.log('J2 created');
+		console.log(this);
 	}
 }
